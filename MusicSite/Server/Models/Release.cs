@@ -37,9 +37,18 @@ namespace MusicSite.Server.Models
         public string ShortDescription { get; set; }
 
         [MaxLength(2000)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
 
-        public List<ReleaseSong> ReleaseSongs;
+        public ICollection<ReleaseSong>? ReleaseSongs { get; set; }
+
+        public ICollection<Article>? RelatedArticles { get; }
+
+        public static void CreateModel(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Release>()
+                .HasIndex(release => new { release.Codename, release.Language })
+                .IsUnique();
+        }
     }
 }
