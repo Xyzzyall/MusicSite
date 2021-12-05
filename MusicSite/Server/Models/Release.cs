@@ -40,7 +40,7 @@ namespace MusicSite.Server.Models
         public string? Description { get; set; }
 
 
-        public ICollection<ReleaseSong>? ReleaseSongs { get; set; }
+        public ICollection<ReleaseSong> ReleaseSongs { get; set; }
 
         public ICollection<Article>? RelatedArticles { get; }
 

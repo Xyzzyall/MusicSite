@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MusicSite.Server.Data;
 using MusicSite.Server.Models;
+using MusicSite.Shared.SharedModels;
 
 namespace MusicSite.Server.Controllers
 {
@@ -19,6 +20,65 @@ namespace MusicSite.Server.Controllers
             _context = context;
         }
 
+        // GET: Releases
+        public async Task<IActionResult> IndexByAuthor(string author, string language)
+        {
+            var query = _context.Release
+                .Where(release => release.Language == language && release.Author == author);
+
+            var query_list = await query.ToArrayAsync();
+
+            var shared_releases = query_list.Select(
+                release => new Shared.SharedModels.Release 
+                {
+                    Codename = release.Codename,
+                    Language = release.Language,
+                    Name = release.Name,
+                    Type = release.Type,
+                    DateRelease = release.DateRelease,
+                    Author = release.Author,
+                    ShortDescription = release.ShortDescription,
+                    Description = release.Description,
+                    DurationInSecs = release.ReleaseSongs.Sum(song => song.LengthSecs)
+                }
+            ).ToArray();
+
+            return View(shared_releases);
+        }
+
+        public async Task<IActionResult> GetRelease(string codename, string language)
+        {
+            var query = _context.Release
+                .Where(release => release.Codename == codename && release.Language == language);
+
+            var query_result = await query.FirstAsync();
+
+            var shared_release = new Shared.SharedModels.Release
+            {
+                Codename = query_result.Codename,
+                Language = query_result.Language,
+                Author = query_result.Author,
+                Name = query_result.Name,
+                DateRelease = query_result.DateRelease,
+                Description = query_result.Description,
+                ShortDescription= query_result.ShortDescription,
+                Songs = query_result.ReleaseSongs.Select(
+                    song => new Shared.SharedModels.ReleaseSong
+                    {
+                        Name = song.Name,
+                        Description = song.Description,
+                        Lyrics = song.Lyrics,
+                        IsInstrumental = song.Lyrics is null,
+                        LengthSecs = song.LengthSecs
+                    }
+                ).ToArray(),
+                DurationInSecs = query_result.ReleaseSongs.Sum(song => song.LengthSecs)
+            };
+
+            return View(shared_release);
+        }
+
+            /*
         // GET: Releases
         public async Task<IActionResult> Index()
         {
@@ -149,5 +209,6 @@ namespace MusicSite.Server.Controllers
         {
             return _context.Release.Any(e => e.Id == id);
         }
+            */
     }
 }

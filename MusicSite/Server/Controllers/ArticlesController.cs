@@ -19,6 +19,23 @@ namespace MusicSite.Server.Controllers
             _context = context;
         }
 
+        public async Task<IActionResult> Index(string language)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IActionResult> IndexByTags(ICollection<string> tags)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<IActionResult> Details(string language, string title)
+        {
+            throw new NotImplementedException();
+        }
+
+        /*
+
         // GET: Articles
         public async Task<IActionResult> Index()
         {
@@ -149,5 +166,6 @@ namespace MusicSite.Server.Controllers
         {
             return _context.Article.Any(e => e.Id == id);
         }
+        */
     }
 }
