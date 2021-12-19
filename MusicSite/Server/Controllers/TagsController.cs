@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicSite.Server.Data;
 using MusicSite.Server.Models;
@@ -20,11 +15,15 @@ namespace MusicSite.Server.Controllers
         }
 
         // GET: Tags
-        public async Task<IActionResult> Index()
+        public async Task<ActionResult<string[]>> IndexTagsLike(CancellationToken cancel, string part)
         {
-            return View(await _context.Tag.ToListAsync());
+            var query = _context.Tag.Where(tag => tag.Name.ToUpper().Contains(part.ToUpper()));
+            var query_result = await query.ToArrayAsync(cancel);
+            var tag_names = query_result.Select(tag => tag.Name).ToArray();
+            return View(tag_names);
         }
 
+        /*
         // GET: Tags/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -149,5 +148,6 @@ namespace MusicSite.Server.Controllers
         {
             return _context.Tag.Any(e => e.Id == id);
         }
+        */
     }
 }

@@ -8,207 +8,99 @@ using Microsoft.EntityFrameworkCore;
 using MusicSite.Server.Data;
 using MusicSite.Server.Models;
 using MusicSite.Shared.SharedModels;
+using MusicSite.Server.Transformations.FromDbModelToShared;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MusicSite.Server.Controllers
 {
+    [Authorize]
     public class ReleasesController : Controller
     {
         private readonly MusicSiteServerContext _context;
+        private readonly ILogger<ReleasesController> _logger;
 
-        public ReleasesController(MusicSiteServerContext context)
+        public ReleasesController(MusicSiteServerContext context, ILogger<ReleasesController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: Releases
-        public async Task<IActionResult> IndexByAuthor(string author, string language)
+        [HttpGet(), AllowAnonymous]
+        public async Task<ActionResult<ReleaseSharedIndex[]>> IndexByAuthor(
+            CancellationToken cancel, 
+            string author, 
+            string language, 
+            int page = 0, 
+            int records_per_page = 100
+        )
         {
             var query = _context.Release
-                .Where(release => release.Language == language && release.Author == author);
+                .Where(release => release.Language == language && release.Author == author)
+                .Skip(page * records_per_page)
+                .Take(records_per_page);
 
-            var query_list = await query.ToArrayAsync();
-
-            var shared_releases = query_list.Select(
-                release => new Shared.SharedModels.Release 
-                {
-                    Codename = release.Codename,
-                    Language = release.Language,
-                    Name = release.Name,
-                    Type = release.Type,
-                    DateRelease = release.DateRelease,
-                    Author = release.Author,
-                    ShortDescription = release.ShortDescription,
-                    Description = release.Description,
-                    DurationInSecs = release.ReleaseSongs.Sum(song => song.LengthSecs)
-                }
-            ).ToArray();
+            var query_result = await query.ToArrayAsync(cancel);
+            ReleaseSharedIndex[] shared_releases = TransoformReleasesIndex(query_result);
 
             return View(shared_releases);
         }
 
-        public async Task<IActionResult> GetRelease(string codename, string language)
+        private static ReleaseSharedIndex[] TransoformReleasesIndex(Release[] query_result)
+        {
+            return query_result.Select(
+                release => new ToReleaseSharedIndex(release)
+            ).ToArray();
+        }
+
+        // GET: Release
+        [HttpGet, AllowAnonymous]
+        public async Task<ActionResult<ReleaseSharedIndex>> GetRelease(CancellationToken cancel, string codename, string language)
         {
             var query = _context.Release
                 .Where(release => release.Codename == codename && release.Language == language);
-
-            var query_result = await query.FirstAsync();
-
-            var shared_release = new Shared.SharedModels.Release
+            
+            try 
             {
-                Codename = query_result.Codename,
-                Language = query_result.Language,
-                Author = query_result.Author,
-                Name = query_result.Name,
-                DateRelease = query_result.DateRelease,
-                Description = query_result.Description,
-                ShortDescription= query_result.ShortDescription,
-                Songs = query_result.ReleaseSongs.Select(
-                    song => new Shared.SharedModels.ReleaseSong
-                    {
-                        Name = song.Name,
-                        Description = song.Description,
-                        Lyrics = song.Lyrics,
-                        IsInstrumental = song.Lyrics is null,
-                        LengthSecs = song.LengthSecs
-                    }
-                ).ToArray(),
-                DurationInSecs = query_result.ReleaseSongs.Sum(song => song.LengthSecs)
-            };
+                var query_result = await query.FirstAsync(cancel);
 
-            return View(shared_release);
-        }
+                ReleaseSharedIndex shared_release = new ToReleaseSharedDetail(query_result);
 
-            /*
-        // GET: Releases
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Release.ToListAsync());
-        }
-
-        // GET: Releases/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
+                return View(shared_release);
+            }
+            catch (ArgumentNullException)
             {
                 return NotFound();
             }
-
-            var release = await _context.Release
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (release == null)
-            {
-                return NotFound();
-            }
-
-            return View(release);
         }
 
-        // GET: Releases/Create
-        public IActionResult Create()
+        [HttpGet, AllowAnonymous]
+        public async Task<ActionResult<bool>> ReleaseExits(CancellationToken cancel, string codename, string language)
         {
-            return View();
+            var exists = await _context.Release
+                .AnyAsync(release => release.Codename == codename && release.Language == language, cancel);
+
+            return View(exists);
         }
 
-        // POST: Releases/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Codename,Language,Status,Name,Type,DateRelease,Author,ShortDescription,Description")] Release release)
+        public async Task<IActionResult> CreateRelease(ReleaseSharedEditMode release)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(release);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(release);
+            throw new NotImplementedException();
         }
 
-        // GET: Releases/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        [HttpPut]
+        public async Task<IActionResult> UpdateRelease(int id, ReleaseSharedEditMode release)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var release = await _context.Release.FindAsync(id);
-            if (release == null)
-            {
-                return NotFound();
-            }
-            return View(release);
+            throw new NotImplementedException();
         }
 
-        // POST: Releases/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Codename,Language,Status,Name,Type,DateRelease,Author,ShortDescription,Description")] Release release)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteRelease(int id)
         {
-            if (id != release.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(release);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ReleaseExists(release.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(release);
+            throw new NotImplementedException();
         }
-
-        // GET: Releases/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var release = await _context.Release
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (release == null)
-            {
-                return NotFound();
-            }
-
-            return View(release);
-        }
-
-        // POST: Releases/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var release = await _context.Release.FindAsync(id);
-            _context.Release.Remove(release);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ReleaseExists(int id)
-        {
-            return _context.Release.Any(e => e.Id == id);
-        }
-            */
     }
 }

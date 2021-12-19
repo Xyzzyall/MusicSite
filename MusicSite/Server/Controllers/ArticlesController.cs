@@ -7,165 +7,120 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MusicSite.Server.Data;
 using MusicSite.Server.Models;
+using MusicSite.Shared.SharedModels;
+using MusicSite.Server.Transformations.FromDbModelToShared;
+using Microsoft.AspNetCore.Authorization;
+using MediatR;
+using MusicSite.Server.Queries.Article;
 
 namespace MusicSite.Server.Controllers
 {
+    [Authorize]
     public class ArticlesController : Controller
     {
         private readonly MusicSiteServerContext _context;
-
-        public ArticlesController(MusicSiteServerContext context)
+        private readonly ILogger<ArticlesController> _logger;
+        private readonly IMediator _mediator;
+        public ArticlesController(MusicSiteServerContext context, ILogger<ArticlesController> logger, IMediator mediator)
         {
             _context = context;
+            _logger = logger;
+            _mediator = mediator;
         }
 
-        public async Task<IActionResult> Index(string language)
+        [HttpGet, AllowAnonymous]
+        public async Task<ActionResult<ArticleSharedIndex[]>> Index(
+            [FromBody] IndexArticlesQuery query,
+            CancellationToken cancel
+        )
         {
-            throw new NotImplementedException();
+            var result = await _mediator.Send(query, cancel);
+            return View(result);
         }
 
-        public async Task<IActionResult> IndexByTags(ICollection<string> tags)
+        [HttpGet, AllowAnonymous]
+        public async Task<ActionResult<ArticleSharedIndex[]>> IndexByTags(
+            CancellationToken cancel, 
+            string language, 
+            ICollection<string> tags, 
+            int page = 0, 
+            int records_per_page = 20
+        )
         {
-            throw new NotImplementedException();
+            var query = _context.Article
+                .Where(
+                    article => article.Language == language 
+                    && article.Tags.Where(t => tags.Contains(t.Name)).Count() == tags.Count    //todo: there maybe some workaround
+                 )
+                .Skip(page * records_per_page)
+                .Take(records_per_page);
+
+            var query_result = await query.ToArrayAsync(cancel);
+            var shared_articles = TransformArticlesIndex(query_result);
+
+            return View(shared_articles);
         }
 
-        public async Task<IActionResult> Details(string language, string title)
+        [HttpGet, AllowAnonymous]
+        public async Task<ActionResult<ArticleSharedIndex>> Details(
+            CancellationToken cancel,
+            string language,
+            string title
+        )
         {
-            throw new NotImplementedException();
-        }
+            var query = _context.Article
+                .Where(article => article.Language == language && article.Title == title);
 
-        /*
+            try
+            {
+                var query_result = await query.FirstAsync(cancel);
 
-        // GET: Articles
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Article.ToListAsync());
-        }
+                ArticleSharedIndex article_shared = new ToArticleSharedDetail(query_result);
 
-        // GET: Articles/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
+                return View(article_shared);
+            }
+            catch (ArgumentNullException)
             {
                 return NotFound();
             }
-
-            var article = await _context.Article
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (article == null)
-            {
-                return NotFound();
-            }
-
-            return View(article);
         }
 
-        // GET: Articles/Create
-        public IActionResult Create()
+        [HttpGet, AllowAnonymous]
+        public async Task<ActionResult<bool>> ArticleExists(
+            CancellationToken cancel,
+            string language,
+            string title
+        )
         {
-            return View();
+            var exists = await _context.Article
+                .AnyAsync(article => article.Language == language && article.Title == title, cancel);
+
+            return View(exists);
         }
 
-        // POST: Articles/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        private static ArticleSharedIndex[] TransformArticlesIndex(Article[] query_result)
+        {
+            return query_result.Select(
+                article => new ToArticleSharedIndex(article)
+            ).ToArray();
+        }
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Language,Text,CreatedDate,UpdatedDate,PublishDate")] Article article)
+        public async Task<IActionResult> CreateArticle(ArticleSharedEditMode article)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(article);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(article);
+            throw new NotImplementedException();
+        }
+        
+        [HttpPut]
+        public async Task<IActionResult> UpdateArticle(int id, ArticleSharedEditMode article)
+        {
+            throw new NotImplementedException();
         }
 
-        // GET: Articles/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        [HttpDelete]
+        public async Task<IActionResult> DeleteArticle(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var article = await _context.Article.FindAsync(id);
-            if (article == null)
-            {
-                return NotFound();
-            }
-            return View(article);
+            throw new NotImplementedException();
         }
-
-        // POST: Articles/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Language,Text,CreatedDate,UpdatedDate,PublishDate")] Article article)
-        {
-            if (id != article.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(article);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ArticleExists(article.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(article);
-        }
-
-        // GET: Articles/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var article = await _context.Article
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (article == null)
-            {
-                return NotFound();
-            }
-
-            return View(article);
-        }
-
-        // POST: Articles/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var article = await _context.Article.FindAsync(id);
-            _context.Article.Remove(article);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ArticleExists(int id)
-        {
-            return _context.Article.Any(e => e.Id == id);
-        }
-        */
     }
 }

@@ -11,8 +11,11 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 builder.Services.AddDbContext<MusicSiteServerContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MusicSiteServerContext"))
+);
 
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MusicSiteServerContext")));
+builder.Services.AddAuthentication();
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -35,6 +38,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorPages();
 app.MapControllers();

@@ -39,7 +39,6 @@ namespace MusicSite.Server.Models
         [MaxLength(2000)]
         public string? Description { get; set; }
 
-
         public ICollection<ReleaseSong> ReleaseSongs { get; set; }
 
         public ICollection<Article>? RelatedArticles { get; }
