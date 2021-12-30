@@ -1,13 +1,13 @@
 ﻿using MediatR;
 using MusicSite.Shared.SharedModels;
 
-namespace MusicSite.Server.Commands.Releases
+namespace MusicSite.Server.Commands.Articles
 {
-    public class DeleteReleaseCommand : IRequest
+    public class DeleteArticleCommand : IRequest
     {
         public int Id { get; set; }
 
-        public DeleteReleaseCommand(int id)
+        public DeleteArticleCommand(int id)
         {
             Id = id;
         }

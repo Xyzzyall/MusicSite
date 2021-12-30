@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using MusicSite.Shared.SharedModels;
 
-namespace MusicSite.Server.Queries.Article
+namespace MusicSite.Server.Queries.Anon.Article
 {
     public class IndexArticlesQuery : IRequest<ArticleSharedIndex[]>
     {

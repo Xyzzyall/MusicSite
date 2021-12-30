@@ -1,38 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MusicSite.Server.Data;
 using MusicSite.Server.Models;
-using MusicSite.Shared.SharedModels;
 using MusicSite.Server.Transformations.FromDbModelToShared;
-using Microsoft.AspNetCore.Authorization;
+using MusicSite.Shared.SharedModels;
 
 namespace MusicSite.Server.Controllers
 {
-    [Authorize]
-    public class ReleasesController : Controller
+    [ApiController, Route("api/[controller]")]
+    public class ReleasesAnonController : Controller
     {
         private readonly MusicSiteServerContext _context;
-        private readonly ILogger<ReleasesController> _logger;
+        private readonly ILogger<ReleasesAnonController> _logger;
 
-        public ReleasesController(MusicSiteServerContext context, ILogger<ReleasesController> logger)
+        public ReleasesAnonController(MusicSiteServerContext context, ILogger<ReleasesAnonController> logger)
         {
             _context = context;
             _logger = logger;
         }
 
-        // GET: Releases
-        [HttpGet(), AllowAnonymous]
+        [HttpGet("index/{author}")]
         public async Task<ActionResult<ReleaseSharedIndex[]>> IndexByAuthor(
             CancellationToken cancel, 
-            string author, 
-            string language, 
-            int page = 0, 
-            int records_per_page = 100
+            string author,
+            [FromQuery] string language,
+            [FromQuery] int page = 0,
+            [FromQuery] int records_per_page = 100
         )
         {
             var query = _context.Release
@@ -53,9 +46,12 @@ namespace MusicSite.Server.Controllers
             ).ToArray();
         }
 
-        // GET: Release
-        [HttpGet, AllowAnonymous]
-        public async Task<ActionResult<ReleaseSharedIndex>> GetRelease(CancellationToken cancel, string codename, string language)
+        [HttpGet("{codename}")]
+        public async Task<ActionResult<ReleaseSharedIndex>> GetRelease(
+            CancellationToken cancel, 
+            string codename,
+            [FromQuery] string language
+        )
         {
             var query = _context.Release
                 .Where(release => release.Codename == codename && release.Language == language);
@@ -74,8 +70,12 @@ namespace MusicSite.Server.Controllers
             }
         }
 
-        [HttpGet, AllowAnonymous]
-        public async Task<ActionResult<bool>> ReleaseExits(CancellationToken cancel, string codename, string language)
+        [HttpGet("exists/{codename}")]
+        public async Task<ActionResult<bool>> ReleaseExits(
+            CancellationToken cancel, 
+            string codename,
+            [FromQuery] string language
+        )
         {
             var exists = await _context.Release
                 .AnyAsync(release => release.Codename == codename && release.Language == language, cancel);
@@ -85,19 +85,24 @@ namespace MusicSite.Server.Controllers
 
 
 
-        [HttpPost]
-        public async Task<IActionResult> CreateRelease(ReleaseSharedEditMode release)
+        [HttpPost("admin")]
+        public async Task<IActionResult> CreateRelease(
+            [FromBody] ReleaseSharedEditMode release
+        )
         {
             throw new NotImplementedException();
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateRelease(int id, ReleaseSharedEditMode release)
+        [HttpPut("admin/{id}")]
+        public async Task<IActionResult> UpdateRelease(
+            int id, 
+            [FromBody] ReleaseSharedEditMode release
+        )
         {
             throw new NotImplementedException();
         }
 
-        [HttpDelete]
+        [HttpDelete("admin/{id}")]
         public async Task<IActionResult> DeleteRelease(int id)
         {
             throw new NotImplementedException();

@@ -5,17 +5,22 @@ using MusicSite.Server.Models;
 
 namespace MusicSite.Server.Controllers
 {
-    public class TagsController : Controller
+    [ApiController, Route("api/[controller]")]
+    public class TagsAnonController : Controller
     {
         private readonly MusicSiteServerContext _context;
 
-        public TagsController(MusicSiteServerContext context)
+        public TagsAnonController(MusicSiteServerContext context)
         {
             _context = context;
         }
 
         // GET: Tags
-        public async Task<ActionResult<string[]>> IndexTagsLike(CancellationToken cancel, string part)
+        [HttpGet("like")]
+        public async Task<ActionResult<string[]>> IndexTagsLike(
+            CancellationToken cancel, 
+            [FromQuery] string part
+        )
         {
             var query = _context.Tag.Where(tag => tag.Name.ToUpper().Contains(part.ToUpper()));
             var query_result = await query.ToArrayAsync(cancel);
