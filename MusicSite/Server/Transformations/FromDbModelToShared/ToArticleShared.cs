@@ -1,12 +1,12 @@
 ﻿namespace MusicSite.Server.Transformations.FromDbModelToShared
 {
-    public class ToArticleSharedIndex : Shared.SharedModels.ArticleSharedIndex
+    public record ToArticleSharedIndex : Shared.SharedModels.ArticleSharedIndex
     {
         public ToArticleSharedIndex(Models.Article article)
         {
             Title = article.Title;
             Language = article.Language;
-            Tags = article.Tags.Select(tag => tag.Name).ToArray();
+            Tags = article.Tags.Select(tag => tag.Name).ToList();
             ShortText = article.ShortText;
             //CreatedDate = article.CreatedDate,
             UpdatedDate = article.ShowUpdatedDate ? article.UpdatedDate : null;
@@ -15,13 +15,13 @@
         }
     }
 
-    public class ToArticleSharedDetail: Shared.SharedModels.ArticleSharedDetail
+    public record ToArticleSharedDetail: Shared.SharedModels.ArticleSharedDetail
     {
         public ToArticleSharedDetail(Models.Article article)
         {
             Title = article.Title;
             Language = article.Language;
-            Tags = article.Tags.Select(tag => tag.Name).ToArray();
+            Tags = article.Tags.Select(tag => tag.Name).ToList();
             ShortText = article.ShortText;
             Text = article.Text;
             UpdatedDate = article.ShowUpdatedDate ? article.UpdatedDate : null;

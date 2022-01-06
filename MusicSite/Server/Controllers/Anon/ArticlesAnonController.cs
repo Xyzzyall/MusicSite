@@ -8,12 +8,10 @@ namespace MusicSite.Server.Controllers
     [ApiController, Route("api/[controller]")]
     public class ArticlesAnonController : Controller
     {
-        //private readonly MusicSiteServerContext _context;
         private readonly ILogger<ArticlesAnonController> _logger;
         private readonly IMediator _mediator;
         public ArticlesAnonController(ILogger<ArticlesAnonController> logger, IMediator mediator)
         {
-            //_context = context;
             _logger = logger;
             _mediator = mediator;
         }
@@ -28,7 +26,7 @@ namespace MusicSite.Server.Controllers
         {
             var query = new IndexArticlesQuery(language, page, recordsPerPage);
             var result = await _mediator.Send(query, cancel);
-            return View(result);
+            return Ok(result);
         }
 
         [HttpGet("index/byTags")]
@@ -42,7 +40,7 @@ namespace MusicSite.Server.Controllers
         {
             var query = new IndexArticlesByTagsQuery(language, tags, page, records_per_page);
             var result = await _mediator.Send(query, cancel);
-            return View(result);
+            return Ok(result);
         }
 
         [HttpGet("{title}")]
@@ -56,7 +54,7 @@ namespace MusicSite.Server.Controllers
             var result = await _mediator.Send(query, cancel);
 
             if (result is null) return NotFound();
-            return View(result);
+            return Ok(result);
         }
 
         [HttpGet("exists/{title}")]
@@ -68,7 +66,7 @@ namespace MusicSite.Server.Controllers
         {
             var query = new ArticleExistsQuery(language, title);
             var result = await _mediator.Send(query, cancel);
-            return View(result);
+            return Ok(result);
         }
     }
 }

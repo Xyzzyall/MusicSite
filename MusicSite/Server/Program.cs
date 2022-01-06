@@ -1,29 +1,59 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.ResponseCompression;
+﻿using FluentValidation;
+using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MusicSite.Server.Data;
 using MusicSite.Server.Options;
-using Swashbuckle.AspNetCore.Swagger;
-using Swashbuckle.Swagger;
+using MusicSite.Server.PipelineBehaviors;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
 // Add services to the container.
+var services = builder.Services;
+//builder.Services.AddControllersWithViews();
+//builder.Services.AddRazorPages();
+services.AddControllers();
+services.AddTransient(
+    typeof(IPipelineBehavior<,>),
+    typeof(ValidationBehavior<,>)
+);
 
-builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
+var myJwtOptions = new MyJwtOptions();
+configuration.Bind(nameof(MyJwtOptions), myJwtOptions);
+services.AddSingleton(myJwtOptions);
 
-builder.Services.AddDbContext<MusicSiteServerContext>(options =>
+services.AddDbContext<MusicSiteServerContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MusicSiteServerContext"))
 );
 
-builder.Services.AddAuthentication();
-builder.Services.AddAuthorization();
+services.AddAuthentication(x =>
+    {
+        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(x =>
+    {
+        x.SaveToken = true;
+        x.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.ASCII.GetBytes(myJwtOptions.Secret)
+            ),
+            ValidateIssuer = false,
+            ValidateAudience = false,
+            RequireExpirationTime = false,
+            ValidateLifetime = true
+        };
+    });
+services.AddAuthorization();
 
-builder.Services.AddSwaggerGen(x =>
+services.AddSwaggerGen(x =>
 {
     x.SwaggerDoc(
         "v1", 
@@ -33,11 +63,35 @@ builder.Services.AddSwaggerGen(x =>
             Version = "v1"
         }
     );
+    x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme 
+    { 
+        Description = "JWT Auth header using bearer scheme",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey
+    });
+    x.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
-builder.Services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies());
+services.AddMediatR(AppDomain.CurrentDomain.GetAssemblies());
+services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
+
+app.UseAuthentication();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -72,10 +126,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapRazorPages();
+//app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 

@@ -5,11 +5,11 @@ namespace MusicSite.Server.Commands.Articles
 {
     public class CreateArticleCommand : IRequest<int>
     {
-        public ArticleSharedEditMode article { get; set; }
+        public ArticleSharedEditMode Article { get; set; }
 
         public CreateArticleCommand(ArticleSharedEditMode article)
         {
-            this.article = article;
+            this.Article = article;
         }
     }
 }

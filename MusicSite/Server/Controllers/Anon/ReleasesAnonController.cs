@@ -4,6 +4,8 @@ using MusicSite.Server.Data;
 using MusicSite.Server.Models;
 using MusicSite.Server.Transformations.FromDbModelToShared;
 using MusicSite.Shared.SharedModels;
+using MusicSite.Server.Queries.Anon.Release;
+using MediatR;
 
 namespace MusicSite.Server.Controllers
 {
@@ -12,40 +14,28 @@ namespace MusicSite.Server.Controllers
     {
         private readonly MusicSiteServerContext _context;
         private readonly ILogger<ReleasesAnonController> _logger;
+        private readonly IMediator _mediator;
 
-        public ReleasesAnonController(MusicSiteServerContext context, ILogger<ReleasesAnonController> logger)
+        public ReleasesAnonController(MusicSiteServerContext context, ILogger<ReleasesAnonController> logger, IMediator mediator)
         {
             _context = context;
             _logger = logger;
+            _mediator = mediator;
         }
 
-        [HttpGet("index/{author}")]
-        public async Task<ActionResult<ReleaseSharedIndex[]>> IndexByAuthor(
+        [HttpGet("")]
+        public async Task<ActionResult<ReleaseSharedIndex[]>> Index(
             CancellationToken cancel, 
-            string author,
             [FromQuery] string language,
             [FromQuery] int page = 0,
             [FromQuery] int records_per_page = 100
         )
         {
-            var query = _context.Release
-                .Where(release => release.Language == language && release.Author == author)
-                .Skip(page * records_per_page)
-                .Take(records_per_page);
-
-            var query_result = await query.ToArrayAsync(cancel);
-            ReleaseSharedIndex[] shared_releases = TransoformReleasesIndex(query_result);
-
-            return View(shared_releases);
+            var query = new IndexReleasesQuery(language, page, records_per_page);
+            var result = await _mediator.Send(query);
+            return Ok(result);
         }
-
-        private static ReleaseSharedIndex[] TransoformReleasesIndex(Release[] query_result)
-        {
-            return query_result.Select(
-                release => new ToReleaseSharedIndex(release)
-            ).ToArray();
-        }
-
+        
         [HttpGet("{codename}")]
         public async Task<ActionResult<ReleaseSharedIndex>> GetRelease(
             CancellationToken cancel, 
@@ -53,21 +43,13 @@ namespace MusicSite.Server.Controllers
             [FromQuery] string language
         )
         {
-            var query = _context.Release
-                .Where(release => release.Codename == codename && release.Language == language);
-            
-            try 
-            {
-                var query_result = await query.FirstAsync(cancel);
-
-                ReleaseSharedIndex shared_release = new ToReleaseSharedDetail(query_result);
-
-                return View(shared_release);
-            }
-            catch (ArgumentNullException)
+            var query = new ReleaseDetailQuery(codename, language); 
+            var result = await _mediator.Send(query, cancel);
+            if (result is null)
             {
                 return NotFound();
             }
+            return Ok(result);
         }
 
         [HttpGet("exists/{codename}")]
@@ -77,35 +59,9 @@ namespace MusicSite.Server.Controllers
             [FromQuery] string language
         )
         {
-            var exists = await _context.Release
-                .AnyAsync(release => release.Codename == codename && release.Language == language, cancel);
-
-            return View(exists);
-        }
-
-
-
-        [HttpPost("admin")]
-        public async Task<IActionResult> CreateRelease(
-            [FromBody] ReleaseSharedEditMode release
-        )
-        {
-            throw new NotImplementedException();
-        }
-
-        [HttpPut("admin/{id}")]
-        public async Task<IActionResult> UpdateRelease(
-            int id, 
-            [FromBody] ReleaseSharedEditMode release
-        )
-        {
-            throw new NotImplementedException();
-        }
-
-        [HttpDelete("admin/{id}")]
-        public async Task<IActionResult> DeleteRelease(int id)
-        {
-            throw new NotImplementedException();
+            var query = new ReleaseExitstsQuery(codename, language);
+            var exists = await _mediator.Send(query, cancel);
+            return Ok(exists);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace MusicSite.Server.Handlers.Anon.Releases
         public async Task<List<ReleaseSharedIndex>> Handle(IndexReleasesQuery request, CancellationToken cancellationToken)
         {
             var query = _context.Release
-                .Where(release => release.Language == request.Language && release.Author == request.Author)
+                .Where(release => release.Language == request.Language)
                 .Skip(request.Page * request.RecordsPerPage)
                 .Take(request.RecordsPerPage);
 

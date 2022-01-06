@@ -1,15 +1,25 @@
 ﻿using MediatR;
 using MusicSite.Shared.SharedModels;
+using FluentValidation;
+using MusicSite.Server.Validations.Releases;
 
 namespace MusicSite.Server.Commands.Releases
 {
-    public class CreateReleaseCommand : IRequest<int>
+    public class CreateReleaseCommand : IRequest<ValidatedResponse<int>> 
     {
-        public ReleaseSharedEditMode release { get; set; }
+        public ReleaseSharedEditMode Release { get; set; }
 
         public CreateReleaseCommand(ReleaseSharedEditMode release)
         {
-            this.release = release;
+            Release = release;
+        }
+    }
+
+    public class CreateReleaseCommandValidator : AbstractValidator<CreateReleaseCommand>
+    {
+        public CreateReleaseCommandValidator()
+        {
+            RuleFor(cmd => cmd.Release).SetValidator(new ReleaseSharedEditModeValidator());
         }
     }
 }

@@ -3,7 +3,7 @@ using MusicSite.Shared.SharedModels;
 
 namespace MusicSite.Server.Queries.Anon.Release
 {
-    public class ReleaseDetailQuery : IRequest<ReleaseSharedDetail>
+    public class ReleaseDetailQuery : IRequest<ReleaseSharedDetail?>
     {
         public ReleaseDetailQuery(string language, string codename)
         {

@@ -30,6 +30,8 @@ namespace MusicSite.Server.Models
         [Required]
         public DateTime DateRelease { get; set; }
 
+        public bool IsReleased { get; set; }
+
         [Required, MaxLength(50)]
         public string Author { get; set; }
 
@@ -48,6 +50,8 @@ namespace MusicSite.Server.Models
             modelBuilder.Entity<Release>()
                 .HasIndex(release => new { release.Codename, release.Language })
                 .IsUnique();
+            modelBuilder.Entity<Release>().Property(release => release.IsReleased)
+                .HasDefaultValue(false);
         }
     }
 }

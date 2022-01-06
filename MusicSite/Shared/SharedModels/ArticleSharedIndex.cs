@@ -6,32 +6,32 @@ using System.Threading.Tasks;
 
 namespace MusicSite.Shared.SharedModels
 {
-    public class ArticleSharedIndex
+    public record ArticleSharedIndex
     {
-        public string Title { get; set; }
+        public string Title { get; init; }
 
-        public string Language { get; set; }
+        public string Language { get; init; }
 
-        public ICollection<string> Tags { get; set; }
-        public string ShortText { get; set; }
+        public List<string> Tags { get; init; }
+        public string ShortText { get; init; }
 
-        public DateTime? UpdatedDate { get; set; }
+        public DateTime? UpdatedDate { get; init; }
 
-        public DateTime PublishDate { get; set; }
-        public ReleaseSharedIndex? RelatedRelease { get; set; }
+        public DateTime PublishDate { get; init; }
+        public ReleaseSharedIndex? RelatedRelease { get; init; }
     }
 
-    public class ArticleSharedDetail : ArticleSharedIndex
+    public record ArticleSharedDetail : ArticleSharedIndex
     {
-        public string Text { get; set; }
+        public string Text { get; init; }
     }
 
-    public class ArticleSharedEditMode : ArticleSharedDetail
+    public record ArticleSharedEditMode : ArticleSharedDetail
     {
-        public int Id { get; protected set; }
+        public int Id { get; init; }
 
-        public DateTime CreatedDate { get; set; }
+        public DateTime CreatedDate { get; init; }
 
-        public DateTime UpdatedDatePrivate { get; set; }
+        public DateTime UpdatedDatePrivate { get; init; }
     }
 }

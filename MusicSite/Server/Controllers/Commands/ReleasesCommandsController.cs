@@ -19,32 +19,105 @@ namespace MusicSite.Server.Controllers.Commands
         }
 
         [HttpPost("")]
-        public async Task<ActionResult<int>> CreateRelease(
+        public async Task<IActionResult> CreateRelease(
             CancellationToken cancel,
             [FromBody] ReleaseSharedEditMode release
         )
         {
+            _logger.LogInformation("CreateRelease command. Input data: {Release}", release);
             var command = new CreateReleaseCommand(release);
-            var result = await _mediator.Send(command, cancel);
-            return View(result); 
+            try
+            {
+                var result = await _mediator.Send(command, cancel);
+                _logger.LogInformation("Created release ({Release}) with id={Result}", release, result);
+                return Ok(result);
+            }
+            catch (TaskCanceledException ex)
+            {
+                throw ex;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error creating release ({Release}), details: {Message}", release, ex.Message);
+                return BadRequest(ex.Message);
+            } 
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditRelease()
+        public async Task<IActionResult> UpdateRelease(
+            CancellationToken cancellationToken,
+            int id,
+            [FromBody] ReleaseSharedEditMode release
+        )
         {
-            throw new NotImplementedException();
+            _logger.LogInformation("UpdateRelease(id={Id}) command. Input data: {Release}", id, release);
+            var command = new UpdateReleaseCommand(release, id);
+            try
+            {
+                await _mediator.Send(command, cancellationToken);
+                _logger.LogInformation("Updated release (id={Id}, data={Release})", id, release);
+                return Ok();
+            }
+            catch (TaskCanceledException ex)
+            {
+                throw ex;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error updating release (id={Id}, data={Release}), details: {Message}", id, release, ex.Message);
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRelease()
+        public async Task<IActionResult> DeleteRelease(
+            CancellationToken cancellationToken,
+            int id
+        )
         {
-            throw new NotImplementedException();
+            _logger.LogInformation("DeleteRelease(id={Id}) command.", id);
+            var command = new DeleteReleaseCommand(id);
+            try
+            {
+                await _mediator.Send(command, cancellationToken);
+                _logger.LogInformation("Deleted release (id={Id})", id);
+                return Ok();
+            }
+            catch (TaskCanceledException ex)
+            {
+                throw ex;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error deleting release (id={Id}), details: {Message}", id, ex.Message);
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPut("{id}/song")]
-        public async Task<IActionResult> UpdateReleaseSong()
+        public async Task<IActionResult> UpdateReleaseSong(
+            CancellationToken cancellationToken,
+            int id,
+            [FromBody] ReleaseSongShared releaseSong
+        )
         {
-            throw new NotImplementedException();
+            _logger.LogInformation("UpdateReleaseSong(ReleaseId={Id}) command. Input data: {Song}", id, releaseSong);
+            var command = new UpdateReleaseSongCommand(releaseSong, id);
+            try
+            {
+                await _mediator.Send(command, cancellationToken);
+                _logger.LogInformation("Updated release (id={ReleaseId}, data={Song})", id, releaseSong);
+                return Ok();
+            }
+            catch (TaskCanceledException ex)
+            {
+                throw ex;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error updating release song (ReleaseId={Id}, data={Song}), details: {Message}", id, releaseSong, ex.Message);
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
