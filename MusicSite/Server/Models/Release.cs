@@ -30,6 +30,8 @@ namespace MusicSite.Server.Models
         [Required]
         public DateTime DateRelease { get; set; }
 
+        public bool? IsReleased { get; set; }
+
         [Required, MaxLength(50)]
         public string Author { get; set; }
 
@@ -37,9 +39,19 @@ namespace MusicSite.Server.Models
         public string ShortDescription { get; set; }
 
         [MaxLength(2000)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
+        public ICollection<ReleaseSong> ReleaseSongs { get; set; }
 
-        public List<ReleaseSong> ReleaseSongs;
+        public ICollection<Article>? RelatedArticles { get; }
+
+        public static void CreateModel(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Release>()
+                .HasIndex(release => new { release.Codename, release.Language })
+                .IsUnique();
+            modelBuilder.Entity<Release>().Property(release => release.IsReleased)
+                .HasDefaultValue(false);
+        }
     }
 }

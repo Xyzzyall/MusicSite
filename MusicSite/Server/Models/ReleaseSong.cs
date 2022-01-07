@@ -24,12 +24,23 @@ namespace MusicSite.Server.Models
         public string Name { get; set; }
 
         [MaxLength(2000)]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Required]
         public int LengthSecs { get; set; }
 
         [MaxLength(2000)]
-        public string Lyrics { get; set; }
+        public string? Lyrics { get; set; }
+
+        public static void CreateModel(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ReleaseSong>()
+                .HasIndex(song => new { song.ReleaseId, song.SongOrder })
+                .IsUnique();
+
+            modelBuilder.Entity<ReleaseSong>()
+                .HasIndex(song => new { song.ReleaseId, song.Name })
+                .IsUnique();
+        }
     }
 }
