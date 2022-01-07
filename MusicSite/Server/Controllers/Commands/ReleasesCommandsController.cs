@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MusicSite.Server.Commands;
 using MusicSite.Server.Commands.Releases;
 using MusicSite.Shared.SharedModels;
 
@@ -20,15 +21,20 @@ namespace MusicSite.Server.Controllers.Commands
 
         [HttpPost("")]
         public async Task<IActionResult> CreateRelease(
-            CancellationToken cancel,
-            [FromBody] ReleaseSharedEditMode release
+            [FromBody] ReleaseSharedEditMode release,
+            CancellationToken cancel
         )
         {
-            _logger.LogInformation("CreateRelease command. Input data: {Release}", release);
+            _logger.LogDebug("CreateRelease command. Input data: {Release}", release);
             var command = new CreateReleaseCommand(release);
             try
             {
-                var result = await _mediator.Send(command, cancel);
+                var result_raw = await _mediator.Send(command, cancel);
+                if (result_raw.ValidationFailed())
+                {
+                    return BadRequest(result_raw.ValidationFailuresStringArray());
+                }
+                var result = ValidatedResponse<int>.TryCastResponse(result_raw).Result;
                 _logger.LogInformation("Created release ({Release}) with id={Result}", release, result);
                 return Ok(result);
             }
@@ -45,9 +51,9 @@ namespace MusicSite.Server.Controllers.Commands
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRelease(
-            CancellationToken cancellationToken,
             int id,
-            [FromBody] ReleaseSharedEditMode release
+            [FromBody] ReleaseSharedEditMode release,
+            CancellationToken cancellationToken
         )
         {
             _logger.LogInformation("UpdateRelease(id={Id}) command. Input data: {Release}", id, release);
@@ -71,8 +77,8 @@ namespace MusicSite.Server.Controllers.Commands
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRelease(
-            CancellationToken cancellationToken,
-            int id
+            int id,
+            CancellationToken cancellationToken
         )
         {
             _logger.LogInformation("DeleteRelease(id={Id}) command.", id);
@@ -96,9 +102,9 @@ namespace MusicSite.Server.Controllers.Commands
 
         [HttpPut("{id}/song")]
         public async Task<IActionResult> UpdateReleaseSong(
-            CancellationToken cancellationToken,
             int id,
-            [FromBody] ReleaseSongShared releaseSong
+            [FromBody] ReleaseSongShared releaseSong,
+            CancellationToken cancellationToken
         )
         {
             _logger.LogInformation("UpdateReleaseSong(ReleaseId={Id}) command. Input data: {Song}", id, releaseSong);

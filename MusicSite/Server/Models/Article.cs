@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
 namespace MusicSite.Server.Models
@@ -33,7 +29,7 @@ namespace MusicSite.Server.Models
 
         public DateTime PublishDate { get; set; } //default: date creation
 
-        public bool HideFromIndex { get; set; } //default: true
+        public bool? HideFromIndex { get; set; } //default: true
 
         public Release? RelatedRelease { get; set; }
 
@@ -50,15 +46,15 @@ namespace MusicSite.Server.Models
 
             modelBuilder.Entity<Article>()
                 .Property(article => article.CreatedDate)
-                .HasDefaultValue(DateTime.UtcNow);
+                .HasDefaultValueSql("getdate()");
 
             modelBuilder.Entity<Article>()
                 .Property(article => article.UpdatedDate)
-                .HasDefaultValue(DateTime.UtcNow);
+                .HasDefaultValueSql("getdate()");
 
             modelBuilder.Entity<Article>()
                 .Property(article => article.PublishDate)
-                .HasDefaultValue(DateTime.UtcNow);
+                .HasDefaultValueSql("getdate()");
 
             modelBuilder.Entity<Article>()
                 .Property(article => article.HideFromIndex)

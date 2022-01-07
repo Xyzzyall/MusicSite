@@ -16,38 +16,38 @@ namespace MusicSite.Server.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("index")]
+        [HttpGet("")]
         public async Task<ActionResult<ArticleSharedIndex[]>> Index(
-            CancellationToken cancel,
             [FromQuery] string language,
+            CancellationToken cancellationToken,
             [FromQuery] int page = 0,
             [FromQuery] int recordsPerPage = 10
         )
         {
             var query = new IndexArticlesQuery(language, page, recordsPerPage);
-            var result = await _mediator.Send(query, cancel);
+            var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
         }
 
         [HttpGet("index/byTags")]
         public async Task<ActionResult<ArticleSharedIndex[]>> IndexByTags(
-            CancellationToken cancel,
             [FromQuery] string language,
             [FromQuery] List<string> tags,
+            CancellationToken cancellationToken,
             [FromQuery] int page = 0,
             [FromQuery] int records_per_page = 20
         )
         {
             var query = new IndexArticlesByTagsQuery(language, tags, page, records_per_page);
-            var result = await _mediator.Send(query, cancel);
+            var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
         }
 
         [HttpGet("{title}")]
         public async Task<ActionResult<ArticleSharedIndex>> Details(
-            CancellationToken cancel,
             [FromQuery] string language,
-            string title
+            string title,
+            CancellationToken cancel
         )
         {
             var query = new ArticleDetailsQuery(language, title);
@@ -59,9 +59,9 @@ namespace MusicSite.Server.Controllers
 
         [HttpGet("exists/{title}")]
         public async Task<ActionResult<bool>> ArticleExists(
-            CancellationToken cancel,
             [FromQuery] string language,
-            string title
+            string title,
+            CancellationToken cancel
         )
         {
             var query = new ArticleExistsQuery(language, title);

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MusicSite.Server.Data;
 
@@ -11,9 +12,10 @@ using MusicSite.Server.Data;
 namespace MusicSite.Server.Migrations
 {
     [DbContext(typeof(MusicSiteServerContext))]
-    partial class MusicSiteServerContextModelSnapshot : ModelSnapshot
+    [Migration("20220106191904_Version2")]
+    partial class Version2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -239,15 +241,6 @@ namespace MusicSite.Server.Migrations
                         .IsUnique();
 
                     b.ToTable("User");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = -1,
-                            Name = "test",
-                            Rights = "test1;test2",
-                            Secret = "test"
-                        });
                 });
 
             modelBuilder.Entity("MusicSite.Server.Models.Tag", b =>

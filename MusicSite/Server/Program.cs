@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 using MusicSite.Server.Data;
 using MusicSite.Server.Options;
 using MusicSite.Server.PipelineBehaviors;
+using MusicSite.Server.Services;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,7 +44,7 @@ services.AddAuthentication(x =>
         {
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.ASCII.GetBytes(myJwtOptions.Secret)
+                myJwtOptions.GetSecretInBytes()
             ),
             ValidateIssuer = false,
             ValidateAudience = false,
@@ -52,6 +53,8 @@ services.AddAuthentication(x =>
         };
     });
 services.AddAuthorization();
+
+services.AddScoped<IAuthService, AuthService>();
 
 services.AddSwaggerGen(x =>
 {

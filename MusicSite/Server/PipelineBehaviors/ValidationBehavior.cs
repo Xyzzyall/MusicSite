@@ -5,7 +5,7 @@ using MusicSite.Server.Commands;
 namespace MusicSite.Server.PipelineBehaviors
 {
     public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TResponse : ValidatedResponse<object>
+        where TResponse : IValidatedResponse
         where TRequest : IRequest<TResponse>
     {
         private readonly IEnumerable<IValidator<TRequest>> _validators;
@@ -26,7 +26,7 @@ namespace MusicSite.Server.PipelineBehaviors
 
             if (failures.Any())
             {
-                var failResponse = ValidatedResponse<object>.FailedResponse(failures);
+                IValidatedResponse failResponse = ValidatedResponse<object>.FailedResponse(failures);
                 return Task.FromResult((TResponse)failResponse);
             }
 

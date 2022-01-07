@@ -17,8 +17,8 @@ namespace MusicSite.Server.Controllers
         // GET: Tags
         [HttpGet("like")]
         public async Task<ActionResult<List<string>>> IndexTagsLike(
-            CancellationToken cancel, 
-            [FromQuery] string part
+            [FromQuery] string part,
+            CancellationToken cancel
         )
         {
             var query = new TagsLikeQuery(part);

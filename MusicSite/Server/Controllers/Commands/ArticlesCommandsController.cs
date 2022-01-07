@@ -20,8 +20,8 @@ namespace MusicSite.Server.Controllers.Commands
 
         [HttpPost("")]
         public async Task<IActionResult> CreateArticle(
-            CancellationToken cancellationToken,
-            [FromBody] ArticleSharedEditMode article
+            [FromBody] ArticleSharedEditMode article,
+            CancellationToken cancellationToken
         )
         {
             _logger.LogInformation("CreateArticle command. Input data: {Article}", article);
@@ -45,9 +45,9 @@ namespace MusicSite.Server.Controllers.Commands
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateArticle(
-            CancellationToken cancellationToken,
             int id, 
-            [FromBody] ArticleSharedEditMode article
+            [FromBody] ArticleSharedEditMode article,
+            CancellationToken cancellationToken
         )
         {
             _logger.LogInformation("UpdateArticle(id={Id}) command. Input data: {Article}", id, article);
@@ -71,8 +71,8 @@ namespace MusicSite.Server.Controllers.Commands
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteArticle(
-            CancellationToken cancellationToken,
-            int id
+            int id,
+            CancellationToken cancellationToken
         )
         {
             _logger.LogInformation("DeleteArticle(id={Id}) command.", id);

@@ -5,7 +5,10 @@ using MusicSite.Server.Validations.Releases;
 
 namespace MusicSite.Server.Commands.Releases
 {
-    public class CreateReleaseCommand : IRequest<ValidatedResponse<int>> 
+    /// <summary>
+    /// Returns ValidatedResponse<int>
+    /// </summary>
+    public class CreateReleaseCommand : IRequest<IValidatedResponse>
     {
         public ReleaseSharedEditMode Release { get; set; }
 

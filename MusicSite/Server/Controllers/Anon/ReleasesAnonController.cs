@@ -24,23 +24,23 @@ namespace MusicSite.Server.Controllers
         }
 
         [HttpGet("")]
-        public async Task<ActionResult<ReleaseSharedIndex[]>> Index(
-            CancellationToken cancel, 
+        public async Task<ActionResult<ReleaseSharedIndex[]>> Index( 
             [FromQuery] string language,
+            CancellationToken cancel,
             [FromQuery] int page = 0,
             [FromQuery] int records_per_page = 100
         )
         {
             var query = new IndexReleasesQuery(language, page, records_per_page);
-            var result = await _mediator.Send(query);
+            var result = await _mediator.Send(query, cancel);
             return Ok(result);
         }
         
         [HttpGet("{codename}")]
         public async Task<ActionResult<ReleaseSharedIndex>> GetRelease(
-            CancellationToken cancel, 
             string codename,
-            [FromQuery] string language
+            [FromQuery] string language,
+            CancellationToken cancel
         )
         {
             var query = new ReleaseDetailQuery(codename, language); 
@@ -54,9 +54,9 @@ namespace MusicSite.Server.Controllers
 
         [HttpGet("exists/{codename}")]
         public async Task<ActionResult<bool>> ReleaseExits(
-            CancellationToken cancel, 
             string codename,
-            [FromQuery] string language
+            [FromQuery] string language,
+            CancellationToken cancel
         )
         {
             var query = new ReleaseExitstsQuery(codename, language);
