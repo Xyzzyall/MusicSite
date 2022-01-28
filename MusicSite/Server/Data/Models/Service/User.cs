@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
-namespace MusicSite.Server.Models.Service
+namespace MusicSite.Server.Data.Models.Service
 {
     public class User
     {

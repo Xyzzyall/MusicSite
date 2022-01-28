@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 
-namespace MusicSite.Server.Models
+namespace MusicSite.Server.Data.Models
 {
     public class Article
     {
@@ -13,7 +13,7 @@ namespace MusicSite.Server.Models
         [Required, MaxLength(50)]
         public string Language { get; set; }
 
-        public ICollection<Tag> Tags { get; set; }
+        public List<Tag> Tags { get; set; }
 
         [Required, MaxLength(200)]
         public string ShortText { get; set; }

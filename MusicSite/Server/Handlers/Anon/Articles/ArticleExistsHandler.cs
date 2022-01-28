@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MusicSite.Server.Data;
+using MusicSite.Server.Data.Interfaces;
 using MusicSite.Server.Queries.Anon.Article;
 using MusicSite.Server.Transformations.FromDbModelToShared;
 using MusicSite.Shared.SharedModels;
@@ -9,17 +10,17 @@ namespace MusicSite.Server.Handlers.Anon.Articles
 {
     public class ArticleExistsHandler : IRequestHandler<ArticleExistsQuery, bool>
     {
-        private readonly MusicSiteServerContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ArticleExistsHandler(MusicSiteServerContext context)
+        public ArticleExistsHandler(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<bool> Handle(ArticleExistsQuery request, CancellationToken cancellationToken)
         {
-            return await _context.Article
-                .AnyAsync(article => article.Language == request.Language && article.Title == request.Title);
+            return await _unitOfWork.Articles
+                .ArticleExistsAsync(request.Language, request.Title, cancellationToken);
         }
     }
 }

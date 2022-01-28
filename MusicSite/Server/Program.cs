@@ -8,7 +8,10 @@ using MusicSite.Server.Data;
 using MusicSite.Server.Options;
 using MusicSite.Server.PipelineBehaviors;
 using MusicSite.Server.Services;
+using Serilog;
 using System.Text;
+using MusicSite.Server.Data.Interfaces;
+using MusicSite.Server.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -30,6 +33,7 @@ services.AddSingleton(myJwtOptions);
 services.AddDbContext<MusicSiteServerContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MusicSiteServerContext"))
 );
+services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 services.AddAuthentication(x =>
     {

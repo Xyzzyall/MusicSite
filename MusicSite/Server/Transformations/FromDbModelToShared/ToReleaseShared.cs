@@ -1,8 +1,10 @@
-﻿namespace MusicSite.Server.Transformations.FromDbModelToShared
+﻿using MusicSite.Server.Data.Models;
+
+namespace MusicSite.Server.Transformations.FromDbModelToShared
 {
     public record ToReleaseSharedIndex : Shared.SharedModels.ReleaseSharedIndex
     {
-        public ToReleaseSharedIndex(Models.Release release)
+        public ToReleaseSharedIndex(Release release)
         {
             Codename = release.Codename;
             Language = release.Language;
@@ -17,7 +19,7 @@
 
     public record ToReleaseSharedDetail : Shared.SharedModels.ReleaseSharedDetail
     {
-        public ToReleaseSharedDetail(Models.Release release)
+        public ToReleaseSharedDetail(Release release)
         {
             Codename = release.Codename;
             Language = release.Language;
@@ -35,7 +37,7 @@
 
         public record ToReleaseSongSharedIndex : Shared.SharedModels.ReleaseSongShared
         {
-            public ToReleaseSongSharedIndex(Models.ReleaseSong song)
+            public ToReleaseSongSharedIndex(ReleaseSong song)
             {
                 SongOrder = song.SongOrder;
                 Name = song.Name;

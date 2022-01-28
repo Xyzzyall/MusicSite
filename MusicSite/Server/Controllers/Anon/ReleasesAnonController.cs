@@ -1,25 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MusicSite.Server.Data;
-using MusicSite.Server.Models;
-using MusicSite.Server.Transformations.FromDbModelToShared;
-using MusicSite.Shared.SharedModels;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using MusicSite.Server.Queries.Anon.Release;
-using MediatR;
+using MusicSite.Shared;
+using MusicSite.Shared.SharedModels;
 
-namespace MusicSite.Server.Controllers
+namespace MusicSite.Server.Controllers.Anon
 {
-    [ApiController, Route("api/[controller]")]
+    [ApiController, Route(Routing.AnonReleasesController)]
     public class ReleasesAnonController : Controller
     {
-        private readonly MusicSiteServerContext _context;
-        private readonly ILogger<ReleasesAnonController> _logger;
         private readonly IMediator _mediator;
 
-        public ReleasesAnonController(MusicSiteServerContext context, ILogger<ReleasesAnonController> logger, IMediator mediator)
+        public ReleasesAnonController(IMediator mediator)
         {
-            _context = context;
-            _logger = logger;
             _mediator = mediator;
         }
 

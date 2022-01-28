@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using MusicSite.Server.Models;
+using MusicSite.Server.Data.Models;
+using MusicSite.Server.Data.Models.Service;
 
 namespace MusicSite.Server.Data
 {
@@ -14,10 +15,10 @@ namespace MusicSite.Server.Data
         {
         }
 
-        public DbSet<MusicSite.Server.Models.Release> Release { get; set; }
-        public DbSet<MusicSite.Server.Models.Article> Article { get; set; }
-        public DbSet<MusicSite.Server.Models.Tag> Tag { get; set; }
-        public DbSet<MusicSite.Server.Models.Service.User> User { get; set; }
+        public DbSet<Release> Release { get; set; }
+        public DbSet<Article> Article { get; set; }
+        public DbSet<Tag> Tag { get; set; }
+        public DbSet<User> User { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

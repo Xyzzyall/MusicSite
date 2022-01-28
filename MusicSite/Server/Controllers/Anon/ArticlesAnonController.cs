@@ -1,11 +1,12 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MusicSite.Server.Queries.Anon.Article;
+using MusicSite.Shared;
 using MusicSite.Shared.SharedModels;
 
-namespace MusicSite.Server.Controllers
+namespace MusicSite.Server.Controllers.Anon
 {
-    [ApiController, Route("api/[controller]")]
+    [ApiController, Route(Routing.AnonArticlesController)]
     public class ArticlesAnonController : Controller
     {
         private readonly ILogger<ArticlesAnonController> _logger;
@@ -20,27 +21,21 @@ namespace MusicSite.Server.Controllers
         public async Task<ActionResult<ArticleSharedIndex[]>> Index(
             [FromQuery] string language,
             CancellationToken cancellationToken,
+            [FromQuery] List<string>? tags = null,
             [FromQuery] int page = 0,
             [FromQuery] int recordsPerPage = 10
         )
         {
-            var query = new IndexArticlesQuery(language, page, recordsPerPage);
-            var result = await _mediator.Send(query, cancellationToken);
-            return Ok(result);
-        }
+            if (tags is null || !tags.Any())
+            {
+                var query = new IndexArticlesQuery(language, page, recordsPerPage);
+                var result = await _mediator.Send(query, cancellationToken);
+                return Ok(result);
+            }
 
-        [HttpGet("index/byTags")]
-        public async Task<ActionResult<ArticleSharedIndex[]>> IndexByTags(
-            [FromQuery] string language,
-            [FromQuery] List<string> tags,
-            CancellationToken cancellationToken,
-            [FromQuery] int page = 0,
-            [FromQuery] int records_per_page = 20
-        )
-        {
-            var query = new IndexArticlesByTagsQuery(language, tags, page, records_per_page);
-            var result = await _mediator.Send(query, cancellationToken);
-            return Ok(result);
+            var query_tags = new IndexArticlesByTagsQuery(language, tags, page, recordsPerPage);
+            var result_tags = await _mediator.Send(query_tags, cancellationToken);
+            return Ok(result_tags);
         }
 
         [HttpGet("{title}")]
