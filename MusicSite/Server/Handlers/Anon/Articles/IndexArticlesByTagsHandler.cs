@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MusicSite.Server.Data;
+using MusicSite.Server.Data.Interfaces;
 using MusicSite.Server.Queries.Anon.Article;
 using MusicSite.Server.Transformations.FromDbModelToShared;
 using MusicSite.Shared.SharedModels;
@@ -9,27 +10,24 @@ namespace MusicSite.Server.Handlers.Anon.Articles
 {
     public class IndexArticlesByTagsHandler : IRequestHandler<IndexArticlesByTagsQuery, ArticleSharedIndex[]>
     {
-        private readonly MusicSiteServerContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public IndexArticlesByTagsHandler(MusicSiteServerContext context)
+        public IndexArticlesByTagsHandler(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<ArticleSharedIndex[]> Handle(IndexArticlesByTagsQuery request, CancellationToken cancellationToken)
         {
-            var query = _context.Article
-                .Where(
-                    article => article.Language == request.Language
-                    && article.Tags.Where(t => request.Tags.Contains(t.Name)).Count() == request.Tags.Count    //todo: there maybe some workaround
-                 )
-                .Skip(request.Page * request.RecordsPerPage)
-                .Take(request.RecordsPerPage);
+            var articles = await _unitOfWork.Articles
+                .GetArticlesPagedAsync(
+                    request.Language, request.Page, request.RecordsPerPage,
+                    cancellationToken,
+                    request.Tags
+                );
 
-            var query_result = await query.ToArrayAsync(cancellationToken);
-
-            return query_result.Select(
-                article => new ToArticleSharedIndex(article)
+            return articles.Select(
+                article => (ArticleSharedIndex)new ToArticleSharedIndex(article)
             ).ToArray();
         }
     }

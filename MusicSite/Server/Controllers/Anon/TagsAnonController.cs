@@ -1,10 +1,11 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MusicSite.Server.Queries.Anon.Tags;
+using MusicSite.Shared;
 
-namespace MusicSite.Server.Controllers
+namespace MusicSite.Server.Controllers.Anon
 {
-    [ApiController, Route("api/[controller]")]
+    [ApiController, Route(Routing.AnonTagsController)]
     public class TagsAnonController : Controller
     {
         private readonly IMediator _mediator;
@@ -14,8 +15,7 @@ namespace MusicSite.Server.Controllers
             _mediator = mediator;
         }
 
-        // GET: Tags
-        [HttpGet("like")]
+        [HttpGet("")]
         public async Task<ActionResult<List<string>>> IndexTagsLike(
             [FromQuery] string part,
             CancellationToken cancel

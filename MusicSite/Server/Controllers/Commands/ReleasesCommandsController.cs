@@ -3,11 +3,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MusicSite.Server.Commands;
 using MusicSite.Server.Commands.Releases;
+using MusicSite.Shared;
 using MusicSite.Shared.SharedModels;
 
 namespace MusicSite.Server.Controllers.Commands
 {
-    [ApiController, Route("api/[controller]"), Authorize]
+    [ApiController, Route(Routing.ReleasesCrudController), Authorize]
     public class ReleasesCommandsController : Controller
     {
         private readonly ILogger<ReleasesCommandsController> _logger;
@@ -38,9 +39,9 @@ namespace MusicSite.Server.Controllers.Commands
                 _logger.LogInformation("Created release ({Release}) with id={Result}", release, result);
                 return Ok(result);
             }
-            catch (TaskCanceledException ex)
+            catch (TaskCanceledException)
             {
-                throw ex;
+                throw;
             }
             catch (Exception ex)
             {
@@ -49,7 +50,7 @@ namespace MusicSite.Server.Controllers.Commands
             } 
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateRelease(
             int id,
             [FromBody] ReleaseSharedEditMode release,
@@ -64,9 +65,9 @@ namespace MusicSite.Server.Controllers.Commands
                 _logger.LogInformation("Updated release (id={Id}, data={Release})", id, release);
                 return Ok();
             }
-            catch (TaskCanceledException ex)
+            catch (TaskCanceledException)
             {
-                throw ex;
+                throw;
             }
             catch (Exception ex)
             {
@@ -75,13 +76,13 @@ namespace MusicSite.Server.Controllers.Commands
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteRelease(
             int id,
             CancellationToken cancellationToken
         )
         {
-            _logger.LogInformation("DeleteRelease(id={Id}) command.", id);
+            _logger.LogInformation("DeleteRelease(id={Id}) command", id);
             var command = new DeleteReleaseCommand(id);
             try
             {
@@ -89,9 +90,9 @@ namespace MusicSite.Server.Controllers.Commands
                 _logger.LogInformation("Deleted release (id={Id})", id);
                 return Ok();
             }
-            catch (TaskCanceledException ex)
+            catch (TaskCanceledException)
             {
-                throw ex;
+                throw;
             }
             catch (Exception ex)
             {
@@ -100,7 +101,7 @@ namespace MusicSite.Server.Controllers.Commands
             }
         }
 
-        [HttpPut("{id}/song")]
+        [HttpPut("{id:int}/song")]
         public async Task<IActionResult> UpdateReleaseSong(
             int id,
             [FromBody] ReleaseSongShared releaseSong,
@@ -115,9 +116,9 @@ namespace MusicSite.Server.Controllers.Commands
                 _logger.LogInformation("Updated release (id={ReleaseId}, data={Song})", id, releaseSong);
                 return Ok();
             }
-            catch (TaskCanceledException ex)
+            catch (TaskCanceledException)
             {
-                throw ex;
+                throw;
             }
             catch (Exception ex)
             {

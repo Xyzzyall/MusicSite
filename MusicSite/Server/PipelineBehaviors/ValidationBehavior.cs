@@ -15,22 +15,27 @@ namespace MusicSite.Server.PipelineBehaviors
             _validators = validators;
         }
 
-        public Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
+        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken, RequestHandlerDelegate<TResponse> next)
         {
             var context = new ValidationContext<TRequest>(request);
-            var failures = _validators
-                .Select(x => x.Validate(context))
+
+            var validation_results = await Task.WhenAll(
+                    _validators
+                    .Select(async x => await x.ValidateAsync(context, cancellationToken))
+                );
+            
+            var failures = validation_results
                 .SelectMany(x => x.Errors)
                 .Where(x => x is not null)
                 .ToList();
 
             if (failures.Any())
             {
-                IValidatedResponse failResponse = ValidatedResponse<object>.FailedResponse(failures);
-                return Task.FromResult((TResponse)failResponse);
+                IValidatedResponse fail_response = ValidatedResponse<object>.FailedResponse(failures);
+                return (TResponse)fail_response;
             }
 
-            return next();
+            return await next();
         }
     }
 }

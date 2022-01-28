@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MusicSite.Server.Data;
+using MusicSite.Server.Data.Interfaces;
 using MusicSite.Server.Queries.Anon.Article;
 using MusicSite.Server.Transformations.FromDbModelToShared;
 using MusicSite.Shared.SharedModels;
@@ -9,24 +10,20 @@ namespace MusicSite.Server.Handlers.Anon.Articles
 {
     public class IndexArticlesHandler : IRequestHandler<IndexArticlesQuery, ArticleSharedIndex[]>
     {
-        private readonly MusicSiteServerContext _context;
-
-        public IndexArticlesHandler(MusicSiteServerContext contex)
+        private readonly IUnitOfWork _unitOfWork;
+        
+        public IndexArticlesHandler(IUnitOfWork unitOfWork)
         {
-            _context = contex;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<ArticleSharedIndex[]> Handle(IndexArticlesQuery request, CancellationToken cancellationToken)
         {
-            var query = _context.Article
-                .Where(article => article.Language == request.Language)
-                .Skip(request.Page * request.RecordsPerPage)
-                .Take(request.RecordsPerPage);
+            var articles = await _unitOfWork.Articles
+                .GetArticlesPagedAsync(request.Language, request.Page, request.RecordsPerPage, cancellationToken);
 
-            var query_result = await query.ToArrayAsync(cancellationToken);
-
-            return query_result.Select(
-                article => new ToArticleSharedIndex(article)
+            return articles.Select(
+                article => (ArticleSharedIndex)new ToArticleSharedIndex(article)
             ).ToArray();
         }
     }

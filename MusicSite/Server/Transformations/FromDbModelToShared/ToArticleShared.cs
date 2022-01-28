@@ -1,8 +1,10 @@
-﻿namespace MusicSite.Server.Transformations.FromDbModelToShared
+﻿using MusicSite.Server.Data.Models;
+
+namespace MusicSite.Server.Transformations.FromDbModelToShared
 {
     public record ToArticleSharedIndex : Shared.SharedModels.ArticleSharedIndex
     {
-        public ToArticleSharedIndex(Models.Article article)
+        public ToArticleSharedIndex(Article article)
         {
             Title = article.Title;
             Language = article.Language;
@@ -17,7 +19,7 @@
 
     public record ToArticleSharedDetail: Shared.SharedModels.ArticleSharedDetail
     {
-        public ToArticleSharedDetail(Models.Article article)
+        public ToArticleSharedDetail(Article article)
         {
             Title = article.Title;
             Language = article.Language;

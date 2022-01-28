@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MusicSite.Shared;
 
-namespace MusicSite.Server.Controllers
+namespace MusicSite.Server.Controllers.Anon
 {
     [ApiController]
     [Route("[controller]")]

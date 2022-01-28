@@ -33,5 +33,7 @@ namespace MusicSite.Shared.SharedModels
         public DateTime CreatedDate { get; init; }
 
         public DateTime UpdatedDatePrivate { get; init; }
+
+        public bool ShowUpdatedDate { get; set; }
     }
 }
