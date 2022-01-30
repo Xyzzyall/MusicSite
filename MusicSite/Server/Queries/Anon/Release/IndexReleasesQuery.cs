@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using MusicSite.Shared.SharedModels;
+using MusicSite.Shared.SharedModels.Anon;
 
 namespace MusicSite.Server.Queries.Anon.Release
 {

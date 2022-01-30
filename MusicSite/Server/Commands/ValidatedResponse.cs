@@ -1,6 +1,4 @@
-﻿using MediatR;
-using FluentValidation;
-using FluentValidation.Results;
+﻿using FluentValidation.Results;
 
 namespace MusicSite.Server.Commands
 {
@@ -27,7 +25,9 @@ namespace MusicSite.Server.Commands
             {
                 throw new InvalidOperationException("Bad response or request was successful.");
             }
-            return ValidationFailures.Select(x => x.ErrorMessage).ToArray();
+            return ValidationFailures?
+                .Select(x => x.ErrorMessage).ToArray() 
+                ?? Array.Empty<string>();
         }
 
         public static ValidatedResponse<T> FailedResponse(ICollection<ValidationFailure> failures)

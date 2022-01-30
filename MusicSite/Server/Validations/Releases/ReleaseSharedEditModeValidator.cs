@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using MusicSite.Shared.SharedModels;
+using MusicSite.Shared.SharedModels.Anon;
 
 namespace MusicSite.Server.Validations.Releases
 {

@@ -5,14 +5,11 @@ using MusicSite.Server.Validations.Releases;
 
 namespace MusicSite.Server.Commands.Releases
 {
-    /// <summary>
-    /// Returns ValidatedResponse<int>
-    /// </summary>
     public class CreateReleaseCommand : IRequest<IValidatedResponse>
     {
-        public ReleaseSharedEditMode Release { get; set; }
+        public ReleaseCreate Release { get; set; }
 
-        public CreateReleaseCommand(ReleaseSharedEditMode release)
+        public CreateReleaseCommand(ReleaseCreate release)
         {
             Release = release;
         }
@@ -22,7 +19,7 @@ namespace MusicSite.Server.Commands.Releases
     {
         public CreateReleaseCommandValidator()
         {
-            RuleFor(cmd => cmd.Release).SetValidator(new ReleaseSharedEditModeValidator());
+            //RuleFor(cmd => cmd.Release).SetValidator(new ReleaseSharedEditModeValidator());
         }
     }
 }

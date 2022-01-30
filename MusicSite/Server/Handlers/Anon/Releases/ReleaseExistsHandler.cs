@@ -2,8 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using MusicSite.Server.Data;
 using MusicSite.Server.Queries.Anon.Release;
-using MusicSite.Server.Transformations.FromDbModelToShared;
-using MusicSite.Shared.SharedModels;
 
 namespace MusicSite.Server.Handlers.Anon.Releases
 {

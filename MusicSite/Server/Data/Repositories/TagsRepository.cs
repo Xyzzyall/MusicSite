@@ -41,7 +41,9 @@ namespace MusicSite.Server.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public override Task<List<Tag>> FindPagedAsync(Expression<Func<Tag, bool>> predicate, int page, int recordsPerPage, CancellationToken cancel)
+        public override Task<List<Tag>> FindPagedAsync(Expression<Func<Tag, bool>> predicate, int page,
+            int recordsPerPage, CancellationToken cancel, Expression<Func<Tag, bool>>? additionalPredicate = null)
+
         {
             throw new NotImplementedException();
         }

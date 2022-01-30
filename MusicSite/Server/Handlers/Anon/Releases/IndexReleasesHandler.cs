@@ -4,6 +4,7 @@ using MusicSite.Server.Data;
 using MusicSite.Server.Queries.Anon.Release;
 using MusicSite.Server.Transformations.FromDbModelToShared;
 using MusicSite.Shared.SharedModels;
+using MusicSite.Shared.SharedModels.Anon;
 
 namespace MusicSite.Server.Handlers.Anon.Releases
 {
@@ -25,8 +26,8 @@ namespace MusicSite.Server.Handlers.Anon.Releases
 
             var query_result = await query.ToListAsync(cancellationToken);
             return query_result.Select(
-                release => new ToReleaseSharedIndex(release)
-            ).ToList<ReleaseSharedIndex>();
+                release => release.ToReleaseSharedIndex()
+            ).ToList();
         }
     }
 }

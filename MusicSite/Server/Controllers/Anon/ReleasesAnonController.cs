@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MusicSite.Server.Queries.Anon.Release;
 using MusicSite.Shared;
-using MusicSite.Shared.SharedModels;
+using MusicSite.Shared.SharedModels.Anon;
 
 namespace MusicSite.Server.Controllers.Anon
 {
@@ -21,10 +21,10 @@ namespace MusicSite.Server.Controllers.Anon
             [FromQuery] string language,
             CancellationToken cancel,
             [FromQuery] int page = 0,
-            [FromQuery] int records_per_page = 100
+            [FromQuery] int recordsPerPage = 100
         )
         {
-            var query = new IndexReleasesQuery(language, page, records_per_page);
+            var query = new IndexReleasesQuery(language, page, recordsPerPage);
             var result = await _mediator.Send(query, cancel);
             return Ok(result);
         }

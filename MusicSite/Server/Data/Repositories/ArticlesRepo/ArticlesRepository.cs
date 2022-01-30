@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using MusicSite.Server.Data.Interfaces;
 using MusicSite.Server.Data.Models;
 
-namespace MusicSite.Server.Data.Repositories
+namespace MusicSite.Server.Data.Repositories.ArticlesRepo
 {
-    public class ArticlesRepository : Repository<Article>, IArticlesRepository
+    public partial class ArticlesRepository : Repository<Article>, IArticlesRepository
     {
         private readonly ITagsRepository _tagsRepository;
 
@@ -30,7 +30,8 @@ namespace MusicSite.Server.Data.Repositories
         public Task<List<Article>> GetArticlesPagedAsync(
             string language, int page, int recordsPerPage,
             CancellationToken cancellationToken,
-            List<string>? tags = null
+            List<string>? tags = null,
+            Expression<Func<Article, bool>>? additionalPredicate = null
         )
         {
             if (tags is null)
@@ -39,7 +40,8 @@ namespace MusicSite.Server.Data.Repositories
                     article => article.Language == language,
                     page,
                     recordsPerPage,
-                    cancellationToken
+                    cancellationToken,
+                    additionalPredicate
                 );
             }
 
@@ -51,7 +53,8 @@ namespace MusicSite.Server.Data.Repositories
                     article.Tags.Count(t => tags.Contains(t.Name.ToLower())) == tags.Count,
                 page,
                 recordsPerPage,
-                cancellationToken
+                cancellationToken,
+                additionalPredicate
             );
         }
 
@@ -76,15 +79,20 @@ namespace MusicSite.Server.Data.Repositories
                 .ToListAsync(cancellationToken: cancel);
         }
 
-        public override Task<List<Article>> FindPagedAsync(Expression<Func<Article, bool>> predicate, int page, int recordsPerPage, CancellationToken cancel)
+        public override Task<List<Article>> FindPagedAsync(Expression<Func<Article, bool>> predicate, int page, int recordsPerPage, CancellationToken cancel, Expression<Func<Article, bool>>? additionalPredicate = null)
         {
-            return Context.Article
+            var query = Context.Article
                 .Include(a => a.Tags)
                 .Where(predicate)
                 .OrderByDescending(e => e.PublishDate)
                 .Skip(page * recordsPerPage)
-                .Take(recordsPerPage)
-                .ToListAsync(cancellationToken: cancel);
+                .Take(recordsPerPage);
+            if (additionalPredicate is null)
+            {
+                return query.ToListAsync(cancellationToken: cancel);
+            }
+
+            return query.Where(additionalPredicate).ToListAsync(cancellationToken: cancel);
         }
     }
 }

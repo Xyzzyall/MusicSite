@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MusicSite.Shared.SharedModels
+﻿namespace MusicSite.Shared.SharedModels.Anon
 {
     public record ReleaseSharedIndex
     {

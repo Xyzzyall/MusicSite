@@ -26,9 +26,15 @@ namespace MusicSite.Server.Data.Repositories
             _entities.Add(entity);
         }
 
-        public Task<List<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancel)
+        public Task<List<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancel,
+            Expression<Func<TEntity, bool>>? additionalPredicate = null)
         {
-            return _entities.Where(predicate).ToListAsync(cancel);
+            var query = _entities.Where(predicate);
+            if (additionalPredicate is null)
+            {
+                return query.ToListAsync(cancel);
+            }
+            return _entities.Where(additionalPredicate).ToListAsync(cancel);
         }
 
         public Task<List<TEntity>> GetAllAsync(CancellationToken cancel)
@@ -59,6 +65,7 @@ namespace MusicSite.Server.Data.Repositories
         public abstract Task<List<TEntity>> GetAllPagedAsync(int page, int recordsPerPage, CancellationToken cancel);
 
         public abstract Task<List<TEntity>> FindPagedAsync(Expression<Func<TEntity, bool>> predicate, int page,
-            int recordsPerPage, CancellationToken cancel);
+            int recordsPerPage, CancellationToken cancel,
+            Expression<Func<TEntity, bool>>? additionalPredicate = null);
     }
 }

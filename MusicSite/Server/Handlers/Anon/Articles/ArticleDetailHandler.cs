@@ -1,10 +1,9 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
-using MusicSite.Server.Data;
 using MusicSite.Server.Data.Interfaces;
 using MusicSite.Server.Queries.Anon.Article;
 using MusicSite.Server.Transformations.FromDbModelToShared;
 using MusicSite.Shared.SharedModels;
+using MusicSite.Shared.SharedModels.Anon;
 
 namespace MusicSite.Server.Handlers.Anon.Articles
 {
@@ -20,8 +19,8 @@ namespace MusicSite.Server.Handlers.Anon.Articles
         public async Task<ArticleSharedDetail?> Handle(ArticleDetailsQuery request, CancellationToken cancellationToken)
         {
             var article_entity = await _unitOfWork.Articles
-                .TryToGetArticleAsync(request.Language, request.Title, cancellationToken);
-            return article_entity is null ? null : new ToArticleSharedDetail(article_entity);
+                .TryToGetArticleAnonAsync(request.Language, request.Title, cancellationToken);
+            return article_entity?.ToArticleSharedDetail();
         }
     }
 }

@@ -2,7 +2,7 @@
 using MusicSite.Server.Data.Interfaces;
 using MusicSite.Server.Data.Models;
 
-namespace MusicSite.Server.Data.Repositories;
+namespace MusicSite.Server.Data.Repositories.ReleasesRepo;
 
 public class ReleasesRepository : Repository<Release>, IReleasesRepository
 {
@@ -23,7 +23,8 @@ public class ReleasesRepository : Repository<Release>, IReleasesRepository
         throw new NotImplementedException();
     }
 
-    public override Task<List<Release>> FindPagedAsync(Expression<Func<Release, bool>> predicate, int page, int recordsPerPage, CancellationToken cancel)
+    public override Task<List<Release>> FindPagedAsync(Expression<Func<Release, bool>> predicate, int page, int recordsPerPage,
+        CancellationToken cancel, Expression<Func<Release, bool>>? additionalPredicate = null)
     {
         throw new NotImplementedException();
     }
