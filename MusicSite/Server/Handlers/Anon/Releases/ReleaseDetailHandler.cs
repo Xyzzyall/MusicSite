@@ -4,6 +4,7 @@ using MusicSite.Server.Data;
 using MusicSite.Server.Queries.Anon.Release;
 using MusicSite.Server.Transformations.FromDbModelToShared;
 using MusicSite.Shared.SharedModels;
+using MusicSite.Shared.SharedModels.Anon;
 
 namespace MusicSite.Server.Handlers.Anon.Releases
 {
@@ -21,9 +22,8 @@ namespace MusicSite.Server.Handlers.Anon.Releases
             var query = _context.Release
                 .Where(release => release.Codename == request.Codename && release.Language == request.Language);
 
-            var query_result = await query.FirstAsync(cancellationToken);
-            if (query_result is null) return null;
-            return new ToReleaseSharedDetail(query_result);
+            var query_result = await query.FirstOrDefaultAsync(cancellationToken);
+            return query_result?.ToReleaseSharedDetail();
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using MusicSite.Server.Services;
 using MusicSite.Server.Services.Interfaces;
 using MusicSite.Shared;
 
@@ -23,27 +22,40 @@ namespace MusicSite.Server.Controllers.Anon
         )
         {
             var auth_result = await _authService.LoginAsync(secret, cancellationToken);
-            if (auth_result.Success)
-            {
-                return Ok(auth_result.Token);
-            }
-            return BadRequest(auth_result.Errors);
+            if (!auth_result.Success) return BadRequest(auth_result.Errors);
+            ApplyTokenHeader(auth_result);
+            return Ok();
         }
 
-        [HttpPut]
+        private void ApplyTokenHeader(IAuthService.AuthResult authResult)
+        {
+            HttpContext.Response.Headers
+                .Add("Authorization", $"Bearer {authResult.Token}");
+        }
+
+        [HttpPut("")]
         [Authorize]
         public async Task<IActionResult> RefreshToken(CancellationToken cancellationToken)
         {
             var user_name = HttpContext.User.Identity?.Name;
-            if (user_name is null)
+            var secret = HttpContext.User.Claims
+                .FirstOrDefault(c => c.Subject?.Name == "secret")?
+                .Value;
+            if (user_name is null || secret is null)
             {
                 return BadRequest("Invalid token structure");
             }
+            
+            if (!await _authService.UserExistsAsync(user_name, cancellationToken))
+            {
+                return BadRequest($"User '{user_name}' was deleted");
+            }
 
-            var auth_result = await _authService.RefreshToken(user_name, cancellationToken);
+            var auth_result = await _authService.LoginAsync(secret, cancellationToken);
             if (auth_result.Success)
             {
-                return Ok(auth_result.Token);
+                ApplyTokenHeader(auth_result);
+                return Ok();
             }
             return BadRequest(auth_result.Errors);
         }

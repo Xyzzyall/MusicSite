@@ -36,8 +36,8 @@
   <ItemGroup>
     <Folder Include="Handlers\Queries\Articles\" />
     <Folder Include="Handlers\Queries\Releases\" />
-    <Folder Include="Queries\Article\" />
-    <Folder Include="Queries\Release\" />
+    <Folder Include="Queries\ArticleQueries\" />
+    <Folder Include="Queries\ReleaseQueries\" />
   </ItemGroup>
 
 

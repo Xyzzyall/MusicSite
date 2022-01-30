@@ -7,7 +7,8 @@ namespace MusicSite.Server.Data.Interfaces
     {
         Task<List<TEntity>> GetAllAsync(CancellationToken cancel);
         ValueTask<TEntity?> GetAsync(int id, CancellationToken cancel);
-        Task<List<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancel);
+        Task<List<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, 
+            CancellationToken cancel, Expression<Func<TEntity, bool>>? additionalPredicate = null);
         void Add(TEntity entity);
         void AddAll(IEnumerable<TEntity> entities);
         void Remove(TEntity entity);
@@ -16,7 +17,8 @@ namespace MusicSite.Server.Data.Interfaces
         Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancel);
 
         Task<List<TEntity>> GetAllPagedAsync(int page, int recordsPerPage, CancellationToken cancel);
-        Task<List<TEntity>> FindPagedAsync(Expression<Func<TEntity, bool>> predicate, int page, int recordsPerPage, CancellationToken cancel);
+        Task<List<TEntity>> FindPagedAsync(Expression<Func<TEntity, bool>> predicate, int page, int recordsPerPage, 
+            CancellationToken cancel, Expression<Func<TEntity, bool>>? additionalPredicate = null);
         
     }
 }

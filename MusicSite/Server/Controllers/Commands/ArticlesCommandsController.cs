@@ -5,6 +5,7 @@ using MusicSite.Server.Commands;
 using MusicSite.Server.Commands.Articles;
 using MusicSite.Shared;
 using MusicSite.Shared.SharedModels;
+using MusicSite.Shared.SharedModels.Anon;
 
 namespace MusicSite.Server.Controllers.Commands
 {

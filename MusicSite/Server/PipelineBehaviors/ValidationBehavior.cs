@@ -31,7 +31,7 @@ namespace MusicSite.Server.PipelineBehaviors
 
             if (failures.Any())
             {
-                IValidatedResponse fail_response = ValidatedResponse<object>.FailedResponse(failures);
+                IValidatedResponse fail_response = ValidatedResponse<Unit>.FailedResponse(failures);
                 return (TResponse)fail_response;
             }
 

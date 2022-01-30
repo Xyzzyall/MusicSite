@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using MusicSite.Shared.SharedModels;
 
 namespace MusicSite.Server.Commands.Articles
 {

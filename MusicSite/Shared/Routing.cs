@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MusicSite.Shared
+﻿namespace MusicSite.Shared
 {
-    public class Routing
+    public static class Routing
     {
         public const string Root = "/api";
 
@@ -21,5 +15,6 @@ namespace MusicSite.Shared
         public const string ReleasesCrudController = Root + "/Releases";
         public const string ArticlesCrudController = Root + "/Articles";
 
+        public const string ArticleQueriesController = Root + "/ArticleQueries";
     }
 }

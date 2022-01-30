@@ -29,7 +29,7 @@ namespace MusicSite.Server.Data.Models
 
         public DateTime PublishDate { get; set; } //default: date creation
 
-        public bool? HideFromIndex { get; set; } //default: true
+        public bool HideFromIndex { get; set; } //default: true
 
         public Release? RelatedRelease { get; set; }
 

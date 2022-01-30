@@ -5,6 +5,7 @@ using MusicSite.Server.Commands;
 using MusicSite.Server.Commands.Releases;
 using MusicSite.Shared;
 using MusicSite.Shared.SharedModels;
+using ReleaseSongShared = MusicSite.Shared.SharedModels.ReleaseSongShared;
 
 namespace MusicSite.Server.Controllers.Commands
 {
@@ -22,7 +23,7 @@ namespace MusicSite.Server.Controllers.Commands
 
         [HttpPost("")]
         public async Task<IActionResult> CreateRelease(
-            [FromBody] ReleaseSharedEditMode release,
+            [FromBody] ReleaseCreate release,
             CancellationToken cancel
         )
         {
@@ -53,10 +54,12 @@ namespace MusicSite.Server.Controllers.Commands
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateRelease(
             int id,
-            [FromBody] ReleaseSharedEditMode release,
+            [FromBody] ReleaseUpdate release,
             CancellationToken cancellationToken
         )
         {
+            throw new NotImplementedException();
+            /*
             _logger.LogInformation("UpdateRelease(id={Id}) command. Input data: {Release}", id, release);
             var command = new UpdateReleaseCommand(release, id);
             try
@@ -74,6 +77,7 @@ namespace MusicSite.Server.Controllers.Commands
                 _logger.LogError("Error updating release (id={Id}, data={Release}), details: {Message}", id, release, ex.Message);
                 return BadRequest(ex.Message);
             }
+            */
         }
 
         [HttpDelete("{id:int}")]
@@ -97,32 +101,6 @@ namespace MusicSite.Server.Controllers.Commands
             catch (Exception ex)
             {
                 _logger.LogError("Error deleting release (id={Id}), details: {Message}", id, ex.Message);
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpPut("{id:int}/song")]
-        public async Task<IActionResult> UpdateReleaseSong(
-            int id,
-            [FromBody] ReleaseSongShared releaseSong,
-            CancellationToken cancellationToken
-        )
-        {
-            _logger.LogInformation("UpdateReleaseSong(ReleaseId={Id}) command. Input data: {Song}", id, releaseSong);
-            var command = new UpdateReleaseSongCommand(releaseSong, id);
-            try
-            {
-                await _mediator.Send(command, cancellationToken);
-                _logger.LogInformation("Updated release (id={ReleaseId}, data={Song})", id, releaseSong);
-                return Ok();
-            }
-            catch (TaskCanceledException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError("Error updating release song (ReleaseId={Id}, data={Song}), details: {Message}", id, releaseSong, ex.Message);
                 return BadRequest(ex.Message);
             }
         }

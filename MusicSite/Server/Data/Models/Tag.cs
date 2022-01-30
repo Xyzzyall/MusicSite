@@ -8,7 +8,7 @@ namespace MusicSite.Server.Data.Models
         public int Id { get; set; }
 
         [Required, MaxLength(50)]
-        public string Name { get; set; }
+        public string Name { get; init; }
 
         public ICollection<Article>? Articles { get; set; }
 

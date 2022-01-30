@@ -8,8 +8,6 @@ using MusicSite.Server.Data;
 using MusicSite.Server.Options;
 using MusicSite.Server.PipelineBehaviors;
 using MusicSite.Server.Services;
-using Serilog;
-using System.Text;
 using MusicSite.Server.Data.Interfaces;
 using MusicSite.Server.Services.Interfaces;
 

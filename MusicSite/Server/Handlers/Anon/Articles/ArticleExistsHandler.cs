@@ -1,10 +1,6 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
-using MusicSite.Server.Data;
 using MusicSite.Server.Data.Interfaces;
 using MusicSite.Server.Queries.Anon.Article;
-using MusicSite.Server.Transformations.FromDbModelToShared;
-using MusicSite.Shared.SharedModels;
 
 namespace MusicSite.Server.Handlers.Anon.Articles
 {

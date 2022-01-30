@@ -38,7 +38,7 @@ namespace MusicSite.Server.Services
             return new IAuthService.AuthResult(token_string, true, Array.Empty<string>());
         }
 
-        public async ValueTask<IAuthService.AuthResult> RefreshToken(string userName, CancellationToken cancellationToken)
+        public async ValueTask<IAuthService.AuthResult> RefreshTokenAsync(string userName, CancellationToken cancellationToken)
         {
             var user = await _context.User
                 .Where(u => u.Name == userName)
@@ -54,6 +54,13 @@ namespace MusicSite.Server.Services
             return new IAuthService.AuthResult(token_string, true, Array.Empty<string>());
         }
 
+        public Task<bool> UserExistsAsync(string userName, CancellationToken cancellationToken)
+        {
+            return _context.User
+                .Where(u => u.Name == userName)
+                .AnyAsync(cancellationToken);
+        }
+
         private string BuildAndSerializeToken(User user)
         {
             var token_handler = new JwtSecurityTokenHandler();
@@ -62,7 +69,9 @@ namespace MusicSite.Server.Services
             {
                 Subject = new ClaimsIdentity( new[]
                 {
+                    new Claim(JwtRegisteredClaimNames.Name, user.Name),
                     new Claim(JwtRegisteredClaimNames.Sub, user.Name),
+                    new Claim("secret", user.Secret),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim("rights", user.Rights)
                 }),

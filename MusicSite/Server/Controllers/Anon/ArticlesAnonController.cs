@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MusicSite.Server.Queries.Anon.Article;
 using MusicSite.Shared;
-using MusicSite.Shared.SharedModels;
+using MusicSite.Shared.SharedModels.Anon;
 
 namespace MusicSite.Server.Controllers.Anon
 {

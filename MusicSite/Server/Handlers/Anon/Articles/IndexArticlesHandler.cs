@@ -1,10 +1,9 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
-using MusicSite.Server.Data;
 using MusicSite.Server.Data.Interfaces;
 using MusicSite.Server.Queries.Anon.Article;
 using MusicSite.Server.Transformations.FromDbModelToShared;
 using MusicSite.Shared.SharedModels;
+using MusicSite.Shared.SharedModels.Anon;
 
 namespace MusicSite.Server.Handlers.Anon.Articles
 {
@@ -20,10 +19,10 @@ namespace MusicSite.Server.Handlers.Anon.Articles
         public async Task<ArticleSharedIndex[]> Handle(IndexArticlesQuery request, CancellationToken cancellationToken)
         {
             var articles = await _unitOfWork.Articles
-                .GetArticlesPagedAsync(request.Language, request.Page, request.RecordsPerPage, cancellationToken);
+                .GetArticlesAnonPagedAsync(request.Language, request.Page, request.RecordsPerPage, cancellationToken);
 
             return articles.Select(
-                article => (ArticleSharedIndex)new ToArticleSharedIndex(article)
+                article => article.ToArticleSharedIndex()
             ).ToArray();
         }
     }

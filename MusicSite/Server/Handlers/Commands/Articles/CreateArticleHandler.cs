@@ -1,9 +1,5 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
-using MusicSite.Server.Data;
 using MusicSite.Server.Commands.Articles;
-using MusicSite.Server.Transformations.FromDbModelToShared;
-using MusicSite.Shared.SharedModels;
 using MusicSite.Server.Commands;
 using MusicSite.Server.Data.Interfaces;
 using MusicSite.Server.Data.Models;
